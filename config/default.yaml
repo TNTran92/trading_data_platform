@@ -1,0 +1,27 @@
+# spx-momentum defaults — loaded by spx_momentum.config (env/kwarg-overridable).
+# Values per DESIGN-DOC.md §3–§4; scaffold plan Task 2.
+
+universe_source: wikipedia        # or a git-committed fallback CSV path
+
+# strategy
+top_n: 20
+lookback_months: 12
+skip_months: 1                    # classic 12-1 momentum
+rebalance: last_trading_day       # last trading day of month
+
+# cost model (one-way, applied on traded notional)
+cost_bps: 5.0
+slippage_bps: 5.0
+
+# layout
+data_root: data
+artifacts_dir: artifacts
+
+# validation gates — transform fails LOUDLY beyond these (never propagates bad rows)
+null_ratio_max: 0.20
+coverage_min: 0.95
+
+# ingest tuning — chunked downloads, per-ticker isolation
+fetch_chunk_size: 25
+fetch_retries: 3
+fetch_backoff_s: 2.0              # exponential: backoff_s * 2**attempt

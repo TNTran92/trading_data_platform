@@ -1,0 +1,19 @@
+# PLACEHOLDER (scaffold plan Task 14) — local Airflow for the momentum DAG.
+# Final (DESIGN-DOC §4.2): `airflow standalone` (webserver + in-process
+# scheduler), OR webserver + scheduler + worker as separate services.
+services:
+  airflow:
+    image: apache/airflow:2.9.2-python3.12
+    command: standalone
+    environment:
+      AIRFLOW__CORE__EXECUTOR: Sequential
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - airflow_home:/opt/airflow/airflow_home
+    ports:
+      - "8080:8080"
+
+volumes:
+  airflow_home:
