@@ -4,6 +4,7 @@
     "ollama": {
       "options": {
         "baseURL": "http://localhost:11434/v1"
+        //"baseURL": "https://100.115.107.83/v1" // Tailscale
       }
     }
   },
