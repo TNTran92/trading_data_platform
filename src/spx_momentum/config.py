@@ -1,15 +1,25 @@
-# Pydantic settings loaded from config/default.yaml, env-overridable
-# (DESIGN-DOC §4.2; scaffold plan Task 2). PLACEHOLDER: typed interface, no
-# loader body yet, so the stub imports cleanly.
+# Pydantic settings loaded from config/default.yaml (DESIGN-DOC §4.2).
+#
+# Precedence (highest first): kwarg overrides > SPX_* env vars > yaml baseline
+# > field defaults. A missing/invalid value raises a typed pydantic
+# ValidationError, never a crash.
 from __future__ import annotations
 
+import os
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Any
 
+import yaml
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+#: src/spx_momentum/config.py -> up three = repo root, holding config/default.yaml.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_YAML = _REPO_ROOT / "config" / "default.yaml"
 
 
 class Settings(BaseSettings):
-    """Defaults mirror config/default.yaml; env (SPX_*) and kwargs win."""
+    """Defaults mirror config/default.yaml; SPX_* env and kwargs win."""
 
     model_config = SettingsConfigDict(env_prefix="SPX_", extra="allow")
 
@@ -39,10 +49,35 @@ class Settings(BaseSettings):
     fetch_backoff_s: float = 2.0
 
 
-def load_settings(path: str | Path | None = None, **overrides: object) -> Settings:
-    """Plan Task 2: yaml baseline -> env -> kwarg overrides.
+def _load_yaml(path: Path) -> dict[str, object]:
+    with path.open("r", encoding="utf-8") as fh:
+        loaded = yaml.safe_load(fh)
+    return loaded if isinstance(loaded, dict) else {}
 
-    Raises a typed Pydantic error on missing required fields. Once implemented,
-    a module-level singleton `settings = load_settings()` is exposed.
+
+def _env_overrides(for_fields: Mapping[str, object] | None = None) -> dict[str, str]:
+    """SPX_<FIELD> env vars for known fields (only set ones, exact match).
+
+    Unknown SPX_* env vars are ignored so a stray variable can't create an
+    unexpected extra field.
     """
-    raise NotImplementedError("placeholder: yaml+env+kwarg loading per plan Task 2")
+    overrides: dict[str, str] = {}
+    for name in for_fields if for_fields is not None else Settings.model_fields:
+        value = os.environ.get(f"SPX_{name.upper()}")
+        if value is not None:
+            overrides[name] = value
+    return overrides
+
+
+def load_settings(path: str | Path | None = None, **overrides: object) -> Settings:
+    """yaml baseline -> SPX_* env -> kwarg overrides -> validated Settings.
+
+    Raises a typed pydantic ValidationError on missing required fields or
+    wrongly-typed values (e.g. top_n="abc").
+    """
+    base = _load_yaml(Path(path) if path is not None else DEFAULT_YAML)
+    merged: dict[str, Any] = {**base, **_env_overrides(), **overrides}
+    return Settings(**merged)
+
+
+settings = load_settings()
