@@ -4,9 +4,10 @@
 #   supply a seeded synthetic price generator (3-5 tickers, multi-year, with
 #   ENGINEERED trends so top-N and backtest results are hand-verifiable) and a
 #   500-row universe fixture.
-# - `lake(tmp_path)`: a fresh LakeStore rooted in a tmp dir (once implemented).
-# PLACEHOLDER: typed interfaces; bodies stubbed with pytest.skip so the suite
-# collects green and each test names the plan task that will implement it.
+# - `lake(tmp_path)`: a fresh LakeStore rooted in a tmp dir (Task 3).
+#
+# No test opens the network (DESIGN-DOC §4.5): yfinance is monkeypatched in
+# test_ingest.py; socket.create_connection is guarded by _no_network below.
 from __future__ import annotations
 
 from collections.abc import Iterator
@@ -46,6 +47,16 @@ def small_universe() -> pd.DataFrame:
 def universe_500() -> pd.DataFrame:
     """500 well-formed tickers — validates the [480, 530] gate (plan Task 4)."""
     return pd.DataFrame({"ticker": [f"T{i:03d}" for i in range(500)]})
+
+
+@pytest.fixture
+def lake(tmp_path):
+    """A fresh LakeStore rooted in a tmp dir (auto-closed on teardown)."""
+    from spx_momentum.data.store import LakeStore
+
+    store = LakeStore(tmp_path / "data")
+    yield store
+    store.close()
 
 
 @pytest.fixture
