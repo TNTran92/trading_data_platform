@@ -1,7 +1,6 @@
 # Stubs pinning the hand-verifiable backtest invariants (Task 10).
 
 import pytest
-from spx_momentum.backtest import engine
 
 
 def test_no_cost_equity_equals_geometric_product(synthetic_prices) -> None:

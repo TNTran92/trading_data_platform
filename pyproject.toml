@@ -40,6 +40,9 @@ packages = ["src/spx_momentum"]
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+extend-exclude = ["workbook.ipynb", "opencode.json", "opencode.jsonc"]
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
 
 [tool.mypy]

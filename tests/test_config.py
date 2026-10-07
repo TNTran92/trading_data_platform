@@ -1,7 +1,6 @@
 # Stubs for load_settings (Task 2).
 
 import pytest
-from spx_momentum import config
 
 
 def test_defaults_match_yaml() -> None:

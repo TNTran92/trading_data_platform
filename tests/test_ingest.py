@@ -1,7 +1,6 @@
 # Stubs pinning the per-ticker ISOLATION contract (plan Task 5 review focus).
 
 import pytest
-import spx_momentum.data.ingest as ingest
 
 
 def test_one_dead_ticker_still_returns_all_records() -> None:

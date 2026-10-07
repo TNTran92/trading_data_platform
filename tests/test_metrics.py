@@ -2,7 +2,6 @@
 
 import pandas as pd
 import pytest
-from spx_momentum.backtest import metrics
 
 
 def test_sharpe_closed_form(toy_equity_series: pd.Series) -> None:

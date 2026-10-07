@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 
-class Stage(str, enum.Enum):
+class Stage(enum.StrEnum):
     """Lake directories under Settings.data_root (DESIGN-DOC §4.1)."""
 
     RAW = "raw"

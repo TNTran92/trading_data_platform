@@ -2,8 +2,6 @@
 
 import pandas as pd
 import pytest
-from spx_momentum.features import momentum
-from spx_momentum.strategy import signal
 
 
 def test_top_n_picks_actual_top_performers(synthetic_prices: pd.DataFrame) -> None:

@@ -2,7 +2,6 @@
 
 import pandas as pd
 import pytest
-from spx_momentum.features import momentum
 
 
 def test_skip_month_boundary(synthetic_prices: pd.DataFrame) -> None:

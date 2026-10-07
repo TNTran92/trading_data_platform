@@ -28,7 +28,7 @@ class MomentumStrategy(Strategy):
     def __init__(self, cfg: Settings) -> None:
         raise NotImplementedError
 
-    def generate_target_weights(  # type: ignore[override]
+    def generate_target_weights(
         self,
         prices: pd.DataFrame,
         features: pd.DataFrame,

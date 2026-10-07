@@ -3,7 +3,6 @@
 # DESIGN-DOC §4.5). Network-free by conftest._no_network.
 
 import pytest
-from spx_momentum.pipeline import tasks
 
 
 def test_full_chain_row_counts() -> None:

@@ -1,7 +1,6 @@
 # Cost-model invariants (Task 9).
 
 import pytest
-from spx_momentum.backtest import costs
 
 
 def test_10bp_on_one_million() -> None:

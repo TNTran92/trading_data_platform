@@ -2,7 +2,6 @@
 
 import pandas as pd
 import pytest
-import spx_momentum.data.universe as universe
 
 
 def test_validate_accepts_500(universe_500: pd.DataFrame) -> None:
