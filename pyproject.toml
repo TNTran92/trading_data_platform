@@ -16,6 +16,7 @@ dependencies = [
     "PyYAML>=6.0",
     "streamlit>=1.36",
     "matplotlib>=3.9",
+    "pyarrow>=16",
 ]
 
 [project.optional-dependencies]

@@ -72,3 +72,27 @@ def test_fetch_universe_wikipedia_routes_to_parser(monkeypatch: pytest.MonkeyPat
     out = universe.fetch_universe("wikipedia")
     assert list(out.columns) == ["ticker"]
     assert list(out["ticker"]) == ["AAA", "BBB"]
+
+
+def test_parse_wikipedia_symbol_column() -> None:
+    """The pinned parser extracts the Symbol column from a realistic HTML
+    table (no monkeypatching of _parse_wikipedia) — regression guard for
+    the pd.read_html(html-string) file-path bug."""
+    html = (
+        "<html><body><table>"
+        "<tr><th>Symbol</th><th>Security</th><th>GIC Sector</th></tr>"
+        "<tr><td>AAPL</td><td>Apple Inc.</td><td>Technology</td></tr>"
+        "<tr><td>BRK.B</td><td>Berkshire Hathaway</td><td>Finance</td></tr>"
+        "<tr><td>T</td><td>AT&amp;T</td><td>Comm</td></tr>"
+        "</table></body></html>"
+    )
+    df = universe._parse_wikipedia(html)
+    assert list(df.columns) == ["ticker"]
+    assert list(df["ticker"]) == ["AAPL", "BRK.B", "T"]
+
+
+def test_parse_wikipedia_rejects_other_layout() -> None:
+    """A page whose first table lacks 'Symbol' fails loudly."""
+    html = "<html><body><table><tr><th>Name</th></tr><tr><td>Apple</td></table></body></html>"
+    with pytest.raises(universe.UniverseValidationError):
+        universe._parse_wikipedia(html)

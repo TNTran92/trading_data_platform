@@ -15,7 +15,8 @@ import pandas as pd
 _TICKER_RE = re.compile(r"^[A-Z][A-Z0-9]{0,8}[.-]?[A-Z0-9]{0,3}$")
 _MIN_ROWS = 480
 _MAX_ROWS = 530
-_WIKI_URL = "https://en.wikipedia.org/wiki/Lists_of_S%26P_500_companies"
+_WIKI_URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+_USER_AGENT = "spx-momentum-dev/0.1 (S&P 500 research demo; read-only constituents scrape)"
 
 
 class UniverseValidationError(ValueError):
@@ -41,7 +42,10 @@ def _parse_wikipedia(html: str) -> pd.DataFrame:
     Expects the first data table to carry a 'Symbol' column; any other layout
     raises so a format change fails loudly.
     """
-    tables = pd.read_html(html)
+    # NOTE: must be a file-like object — pd.read_html passes bare strings to
+    # lxml.html.parse, which treats them as file paths (OSError →
+    # FileNotFoundError) when the lxml backend is available.
+    tables = pd.read_html(io.StringIO(html))
     if not tables:
         raise UniverseValidationError(None, "no_table", "0", ">=1")
     df = tables[0]
@@ -55,7 +59,10 @@ def _fetch_wikipedia_html() -> str:
     """Network helper (isolated so tests can patch it); returns page HTML."""
     import urllib.request
 
-    resp = urllib.request.urlopen(_WIKI_URL, timeout=30)
+    # A descriptive User-Agent: Wikipedia blocks the urllib default (HTTP 403),
+    # and it doubles as the contact line per our site policy.
+    req = urllib.request.Request(_WIKI_URL, headers={"User-Agent": _USER_AGENT})
+    resp = urllib.request.urlopen(req, timeout=30)
     with io.TextIOWrapper(resp, encoding="utf-8") as fh:
         return fh.read()
 
