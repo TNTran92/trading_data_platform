@@ -1,5 +1,4 @@
 # Strategy ABC (DESIGN-DOC §4.2; scaffold plan Task 8).
-# PLACEHOLDER: interface only.
 from __future__ import annotations
 
 import abc
